@@ -1,7 +1,7 @@
-> **WeKnora‑pro** is a derivative version based on the original **WeKnora**, primarily enhanced for advanced document parsing capabilities.  
-> Key improvements include:
-> * Support for scanned documents via the **Mineru‑API** (with automatic CPU/GPU optimization) for OCR and table extraction, fully compatible with WeKnora’s multimodal pipeline.
-> * Increased maximum document size limit to **300 MB**.
+> **WeKnora‑pro** 是基于原始 **WeKnora** 的二次开发版本，核心在于提升文档解析能力。  
+> 主要改进：
+> * 支持扫描件通过 **Mineru‑API**（CPU/GPU 自动优化）进行 OCR 与表格提取；且兼容WeKnora多模态增加
+> * 文档大小上限提升至 300 MB  
 
 <p align="center">
   <picture>
@@ -11,143 +11,144 @@
 
 ---
 
-## 📌 Project Overview
+## 📌 项目简介
 
-- **Enhanced Parsing**: Integrated a new PDF parser powered by the Mineru backend.
-- **Large File Support**: Supports single files up to **300 MB**.
-- **WeChat Ecosystem Compatibility**: Seamlessly integrates into WeChat Official Accounts, Mini Programs, and other WeChat scenarios.
-
+- **解析增强**：新增mineru后端的pdf解析器
+- **大文件支持**：最大单文件 300 MB
+- **微信生态兼容**：可无缝集成到公众号、小程序等微信场景。
+![](./docs/images/parser.png)
 ---
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-> All instructions below assume a Linux/macOS environment (Windows is also supported). Please ensure the following tools are installed:
+> 所有步骤均基于 Linux/ macOS（Windows 亦可），请先确保已安装以下工具：
 
-| Tool | Official Website |
-|------|------------------|
+| 工具 | 官网 |
+|------|------|
 | Docker | https://www.docker.com/ |
-| Docker Compose | https://docs.docker.com/compose/ |
+| Docker‑Compose | https://docs.docker.com/compose/ |
 | Git | https://git-scm.com/ |
 
-### 1️⃣ Clone the Repository
+### 1️⃣ 克隆仓库
 
 ```bash
-git clone https://github.com/Tencent/WeKnora.git
-cd WeKnora
+git clone https://github.com/xiaohuangpin/WeKnora-pro
+cd WeKnora-pro
 ```
 
-### 2️⃣ Configure Environment Variables
+### 2️⃣ 配置环境变量
 
 ```bash
-cp .env.example .env      # Copy the example configuration file
-# Edit .env to configure database, Redis, OpenAI, etc.
-# Note: For storage backend, MinIO is recommended; the 'local' option may prevent multi-model enhancement from functioning properly.
+cp .env.example .env      # 拷贝示例文件
+# 使用编辑器修改 .env，填写数据库、Redis、OpenAI 等配置信息
+# 注意文件存储类型最好为minio,local选项无法启动多模型增强
 ```
 
-> Detailed descriptions for all variables are provided as comments in `.env.example`.
+> 所有变量说明已在 `.env.example` 注释中提供。
 
-### 3️⃣ Build Images and Start Services
+### 3️⃣ 构建镜像并启动服务
 
 ```bash
-# ① Build Docker images (including Ollama and backend containers)
+# ① 构建镜像（含 Ollama 与后端容器）
 ./scripts/build_images.sh
 
-# ② Start all services (by default, does not pull latest images; remove --no-pull to update)
+# ② 启动所有服务（默认不拉取最新镜像，若需可去掉 --no-pull）
 ./scripts/start_all.sh --no-pull
 ```
 
-> **⏰** First-time startup may take **5–10 minutes** due to image downloads and initialization.
+> **⏰** 第一次启动可能需要 5‑10 min 进行镜像下载与初始化。
 
-### 4️⃣ Launch the Mineru Service (Advanced Document Parser)
+### 4️⃣ 启动 Mineru 服务（一个强大的文档解析）
 
-```bash
-# Create a Python virtual environment
+```bash 
+# 创建 Python 虚拟环境
 conda create -n mineru python=3.10
 conda activate mineru
 
-# Install dependencies
-pip install uv -i https://pypi.tuna.tsinghua.edu.cn/simple     # If network issues occur, use plain pip
-uv pip install -U "mineru[core]"  # Launch the API server
-# For faster parsing on GPUs with >16GB VRAM, consider using "mineru[all]"
+# 安装依赖
+pip install uv -i https://pypi.tuna.tsinghua.edu.cn/simple   # 若无网络，直接 pip
+uv pip install -U "mineru[core]"  # 启动 API（若占用显存 > 16 GB，可根据需要改为 mineru[all]）会有更快解析速度
 
 cd wed_api
 python web_api.py
 ```
 
-> **🛑** After document parsing is complete, press `Ctrl+C` to stop the service and release GPU memory. This will **not** affect the Q&A functionality.
+> **🛑** 文档解析完成后按 `Ctrl+C` 停止服务，释放显存。此操作不会影响问答功能。
 
-### 5️⃣ Stop All Services
+### 5️⃣ 停止所有服务
 
 ```bash
-./scripts/start_all.sh --stop   # or
+./scripts/start_all.sh --stop   # 或者
 make stop-all
 ```
 
 ---
 
-## 🌐 Service Endpoints
+## 🌐 服务访问地址
 
-| Service | URL |
-|--------|-----|
+| 类型 | URL |
+|------|-----|
 | Web UI | `http://localhost` |
-| Backend API | `http://localhost:8080` |
-| Jaeger Tracing | `http://localhost:16686` |
+| 后端 API | `http://localhost:8080` |
+| 链路追踪（Jaeger） | `http://localhost:16686` |
 
-> If deployed on a remote server, replace `localhost` with the appropriate host IP address.
-
----
-
-## 🔧 Contribution Guidelines
-
-1. Fork this repository.  
-2. Clone your fork locally:
-
-   ```bash
-   git clone git@github.com:<your-username>/WeKnora-pro.git
-   cd WeKnora-pro
-   ```
-
-3. Create and switch to a new feature branch:
-
-   ```bash
-   git checkout -b feature/<brief-description>
-   ```
-
-4. Before submitting, ensure that:
-
-   * Code adheres to **PEP8** (Python) and **Prettier** (JavaScript) standards.
-   * Unit/integration tests are added or updated, with **≥80% coverage**.
-   * Documentation and README files are updated accordingly.
-
-5. Push your branch and open a Pull Request:
-
-   ```bash
-   git push origin feature/<brief-description>
-   ```
-
-6. Await review from maintainers.
+> 若部署在远程服务器，请将 `localhost` 替换为对应主机 IP。
 
 ---
 
-## 🙏 Acknowledgements
+## 🔧 贡献指南
 
-This project builds upon the following open-source components:
+1. Fork 本仓库。  
+2. 克隆到本地：  
+
+   ```bash
+   git clone git@github.com:<你的用户名>/WeKnora‑pro.git
+   cd WeKnora‑pro
+   ```
+
+3. 创建并切换分支：  
+
+   ```bash
+   git checkout -b feature/<描述>
+   ```
+
+4. 提交前请确保：
+
+   * 代码遵循 `PEP8`（Python） / `prettier`（JS）规范。  
+   * 添加/更新单元测试，覆盖率 ≥ 80%。  
+   * 更新文档、说明文件。  
+
+5. 推送并提交 PR：  
+
+   ```bash
+   git push origin feature/<描述>
+   ```
+
+6. 等待项目维护者审阅。
+
+---
+
+## 🙏 鸣谢
+
+本项目基于以下开源组件：
 
 - [WeKnora](https://github.com/Tencent/WeKnora)
-- [MinerU](https://github.com/opendatalab/MinerU)
+- [Mineru](https://github.com/opendatalab/MinerU)
 
 ---
 
-## 📜 License & Usage Restrictions
+## 📜 许可证 & 使用限制
 
-1. **AGPL‑v3 License**:  
-   * All derivative works must also be licensed under AGPL‑v3.  
-   * If the software is offered as a network service, users must be able to request and receive the corresponding source code (per Section 13 of AGPL‑v3).
+1. **AGPL‑v3**：  
+   * 所有衍生代码必须同样遵循 AGPL‑v3。  
+   * 若通过网络服务提供软件，用户可下载对应源码（第13条）。  
 
-2. **Commercial Use**:  
-   * Commercial usage—including SaaS offerings and internal enterprise deployments—is permitted.  
-   * Even if the original code is unmodified, full source code disclosure and compliance with AGPL‑v3 requirements are mandatory.  
-   * For proprietary (closed-source) commercial use, **written authorization** from all copyright holders is required.
+2. **商用说明**  
+   * 允许商业使用，包括 SaaS 与企业内部部署。  
+   * 若不修改原始代码，仍需公开完整源代码并满足 AGPL‑v3 条件。  
+   * 要进行闭源商用，请取得所有版权方书面授权。  
 
-3. **Disclaimer**:  
-   This project is provided **“as is”**, without any warranties of any kind. Users are solely responsible for assessing legal and compliance risks. Consult a qualified legal professional when necessary.
+3. **免责声明**  
+   本项目提供“按现状”服务，无任何担保。使用者须自行评估合规风险，必要时请咨询专业律师。
+
+---
