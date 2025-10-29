@@ -1,0 +1,38 @@
+# 忽略.env文件和其他包含敏感信息的配置文件
+.env
+# 但不忽略示例文件
+!.env.example
+*.pem
+*_key
+*_secret
+*.key
+*.crt
+
+# IDE和编辑器文件
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 构建和依赖文件
+node_modules/
+/dist/
+/build/
+*.log
+
+# 临时文件
+tmp/
+temp/
+
+WeKnora
+/models/
+services/docreader/src/proto/__pycache__
+test/data/mswag.txt
+data/files/
+
+.python-version
+.venv/
+
+### macOS
+# General
+.DS_Store
